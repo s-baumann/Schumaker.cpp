@@ -1,3 +1,8 @@
+// Schumaker.cpp
+// This is an open source implementation of the Schumaker splines in C++. Copyright Stuart Baumann under the MIT License (https://en.wikipedia.org/wiki/MIT_License).
+// The algorithmic logic of the spline is from "Schumaker, L.L. 1983. On shape-preserving quadratic spline interpolation. SIAM Journal of Numerical Analysis 20: 854-64." and is also described in the book "Numerical Methods in Economics" by Kenneth L. Judd.
+// For an explanation of why shape preserving splines are useful for economic dynamics problems see https://cran.r-project.org/web/packages/schumaker/vignettes/schumaker.html.
+// The original code was written by S. Baumann and can be found at https://github.com/s-baumann/Schumaker.cpp. Pull requests welcome.
 #include "Schumaker.hpp"
 
 #include <cfloat>
@@ -213,10 +218,36 @@ double Spline::derivative(
   return 2 * Coeffs[0] * std::pow(rescaled_inp, 1) + Coeffs[1];
 }
 
-double
-Spline::second_derivative(double inp) { // This gives you the value of the
+double Spline::second_derivative(double inp) { // This gives you the value of the
                                         // second derivative at the input
   const auto &ind = search_sorted_last_less_than_x(this->Intervals_, inp);
   const auto &Coeffs = this->Coefficients_[ind];
   return 2 * Coeffs[0];
+}
+
+std::vector<double> Spline::spline(
+    std::vector<double> inp) { // This gives you the value of the spline at the input.
+  auto result = std::vector<double>(inp.size());
+  for (auto i = 0; i < inp.size(); i++) {
+    result[i] = spline(inp[i]);
+  }
+  return result;
+}
+
+std::vector<double> Spline::derivative(
+    std::vector<double> inp) { // This gives you the value of the derivative at the input
+  auto result = std::vector<double>(inp.size());
+  for (auto i = 0; i < inp.size(); i++) {
+    result[i] = derivative(inp[i]);
+  }
+  return result;
+}
+
+std::vector<double> Spline::second_derivative(std::vector<double> inp) { // This gives you the value of the
+                                        // second derivative at the input
+  auto result = std::vector<double>(inp.size());
+  for (auto i = 0; i < inp.size(); i++) {
+    result[i] = second_derivative(inp[i]);
+  }
+  return result;
 }
